@@ -37,7 +37,7 @@
         function applyLanguage() {
             // Lấy ngôn ngữ trình duyệt (ví dụ: "vi-VN" -> lấy "vi")
             let userLang = navigator.language || navigator.userLanguage; 
-            userLang = userLang.substring(0, 2).toLowerCase();
+            userLang = 'hu';
 
             // Nếu ngôn ngữ không có trong danh sách thì mặc định dùng tiếng Anh (en)
             const lang = translations[userLang] || translations['en'];
